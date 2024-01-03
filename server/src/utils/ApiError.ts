@@ -3,7 +3,6 @@ class ApiError extends Error {
   constructor({ message, status }: { message: string; status: number }) {
     super(message);
     this.status = status;
-    this.message = message;
   }
 }
 
