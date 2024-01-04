@@ -1,5 +1,6 @@
 {
   "watch": ["src/**/*.ts", "./index.ts"],
   "ignore": ["src/**/*.spec.ts"],
-  "exec": "ts-node ./index.ts"
+  "exec": "ts-node ./index.ts",
+  "delay": 1000
 }

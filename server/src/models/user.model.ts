@@ -8,6 +8,8 @@ interface UserDocument extends Document {
   password: string;
   refreshToken?: string | null | undefined;
   isPasswordCorrect(password: string): Promise<boolean>;
+  generateAccessToken(): string;
+  generateRefreshToken(): string;
 }
 
 const userSchema = new Schema<UserDocument>(
