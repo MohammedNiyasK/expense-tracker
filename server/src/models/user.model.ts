@@ -26,6 +26,13 @@ const userSchema = new Schema<UserDocument>(
     password: {
       type: String,
       required: [true, "Password is required"],
+      validate: {
+        validator: function (value: string) {
+          return /^(?=.*[A-Z])(?=.*[!@#$%^&*])(.{8,})$/.test(value);
+        },
+        message: (props) =>
+          `${props.value} is not a valid password. It should have at least 8 characters with 1 uppercase letter and 1 special character.`,
+      },
     },
     refreshToken: {
       type: String,
@@ -38,6 +45,11 @@ userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
 
   this.password = await hash(this.password, 10);
+  next();
+});
+
+userSchema.pre("save", function (next) {
+  this.email = this.email.toLowerCase();
   next();
 });
 

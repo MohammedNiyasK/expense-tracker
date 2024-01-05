@@ -40,7 +40,9 @@ const signUp = asyncHandler(async (req, res) => {
     password,
   }: { username: string; email: string; password: string } = req.body;
 
-  if ([username, email, password].some((field) => field?.trim() === "")) {
+  if (
+    [username, email, password].some((field) => !field || field?.trim() === "")
+  ) {
     throw new ApiError({ message: "All fileds are required", status: 400 });
   }
 
