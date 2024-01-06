@@ -1,4 +1,5 @@
 import { Schema, model } from "mongoose";
+import dayjs from "dayjs";
 
 const expenseSchema = new Schema(
   {
@@ -23,6 +24,13 @@ const expenseSchema = new Schema(
     date: {
       type: Date,
       default: Date.now,
+      validate: {
+        validator: function (value: string) {
+          const parsedDate = dayjs(value);
+          return parsedDate.isValid();
+        },
+        message: (props: any) => `${props.value} is not a valid date!`,
+      },
     },
     category: {
       type: String,
