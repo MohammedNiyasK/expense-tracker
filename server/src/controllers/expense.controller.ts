@@ -66,9 +66,9 @@ const deleteExpense = asyncHandler(async (req, res) => {
 
   const deletedExpense = await Expense.findByIdAndDelete(expenseId);
 
-  // if(!deletedExpense){
-  //   throw new ApiError({message:"Expense not found",status:404})
-  // }
+  if (!deletedExpense) {
+    throw new ApiError({ message: "Expense not found", status: 404 });
+  }
 
   res.status(200).json(new ApiResponse(200, {}, "Expense deleted succesfully"));
 });
