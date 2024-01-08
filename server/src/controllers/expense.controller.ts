@@ -3,6 +3,8 @@ import { Expense } from "../models/expense.model";
 import { ApiResponse } from "../utils/ApiResponse";
 import { ApiError } from "../utils/ApiError";
 import { WhereClause } from "../utils/WhereClause";
+import mongoose from "mongoose";
+import dayjs from "dayjs";
 
 const createExpense = asyncHandler(async (req, res) => {
   const {
@@ -131,10 +133,46 @@ const recentExpenses = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200, expenses, "Recent expenses found"));
 });
 
+const getExpenseSummary = asyncHandler(async (req, res) => {
+  const today = dayjs();
+
+  const firstDayOfMonth = today.startOf("month").format("YYYY-MM-DD");
+  const endDayOfMonth = today.endOf("month").format("YYYY-MM-DD");
+
+  const userId = req.user?._id;
+
+  const expenses = await Expense.aggregate([
+    {
+      $match: {
+        createdBy: new mongoose.Types.ObjectId(userId),
+        date: {
+          $gte: new Date(firstDayOfMonth),
+          $lt: new Date(endDayOfMonth),
+        },
+      },
+    },
+    {
+      $group: {
+        _id: "$category",
+        totalExpenses: { $sum: "$amount" },
+      },
+    },
+  ]);
+
+  if (!expenses) {
+    throw new ApiError({ message: "No expenes found", status: 404 });
+  }
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, expenses, "Expenses found succesfully"));
+});
+
 export {
   createExpense,
   getExpenses,
   updateExpense,
   deleteExpense,
   recentExpenses,
+  getExpenseSummary,
 };
