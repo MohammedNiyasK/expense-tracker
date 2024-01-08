@@ -2,6 +2,7 @@ import { asyncHandler } from "../utils/asyncHandler";
 import { Expense } from "../models/expense.model";
 import { ApiResponse } from "../utils/ApiResponse";
 import { ApiError } from "../utils/ApiError";
+import { WhereClause } from "../utils/WhereClause";
 
 const createExpense = asyncHandler(async (req, res) => {
   const {
@@ -30,12 +31,29 @@ const createExpense = asyncHandler(async (req, res) => {
 const getExpenses = asyncHandler(async (req, res) => {
   const userId = req.user?._id;
 
-  const expenses = await Expense.find({ createdBy: userId });
+  const countQuery = new WhereClause(
+    Expense.find({ createdBy: userId }),
+    req.query
+  )
+    .search()
+    .filter();
+
+  let count = await countQuery.base.countDocuments(); // Get count
+
+  // Query for pagination
+  const paginationQuery = new WhereClause(
+    Expense.find({ createdBy: userId }),
+    req.query
+  )
+    .search()
+    .filter()
+    .pager();
+
+  let expenses = await paginationQuery.base; // Get paginated results
 
   if (!expenses) {
     throw new ApiError({ message: "No expenses found", status: 404 });
   }
-
   res.status(200).json(new ApiResponse(200, expenses, "Expenses found."));
 });
 
