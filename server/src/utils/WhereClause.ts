@@ -27,10 +27,14 @@ class WhereClause {
   bigQ: BigQ;
   startIndex?: number;
   endIndex?: number;
+  currentPage: number;
+  resultPerPage: number;
 
   constructor(base: Base, bigQ: BigQ) {
     this.base = base;
     this.bigQ = bigQ;
+    this.currentPage = 1;
+    this.resultPerPage = 5;
   }
 
   search() {
@@ -79,13 +83,13 @@ class WhereClause {
   pager() {
     const { limit, page } = this.bigQ;
 
-    let currentPage = Number(page) || 1;
-    let resultPerPage = Number(limit) || 5;
+    this.currentPage = Number(page) || 1;
+    this.resultPerPage = Number(limit) || 5;
 
-    this.startIndex = resultPerPage * (currentPage - 1);
-    this.endIndex = currentPage * resultPerPage;
+    this.startIndex = this.resultPerPage * (this.currentPage - 1);
+    this.endIndex = this.currentPage * this.resultPerPage;
 
-    this.base = this.base.limit(resultPerPage).skip(this.startIndex);
+    this.base = this.base.limit(this.resultPerPage).skip(this.startIndex);
 
     return this;
   }

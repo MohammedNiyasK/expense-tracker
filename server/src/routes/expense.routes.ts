@@ -3,6 +3,7 @@ import {
   createExpense,
   deleteExpense,
   getExpenses,
+  recentExpenses,
   updateExpense,
 } from "../controllers/expense.controller";
 import { verifyJWT } from "../middlewares/auth.middleware";
@@ -12,6 +13,7 @@ const router = Router();
 router.use(verifyJWT);
 
 router.route("/all").get(getExpenses);
+router.route("/recent").get(recentExpenses);
 
 router.route("/create").post(createExpense);
 

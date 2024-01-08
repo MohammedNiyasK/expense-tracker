@@ -31,6 +31,8 @@ const createExpense = asyncHandler(async (req, res) => {
 const getExpenses = asyncHandler(async (req, res) => {
   const userId = req.user?._id;
 
+  const results: any = {};
+
   const countQuery = new WhereClause(
     Expense.find({ createdBy: userId }),
     req.query
@@ -39,6 +41,8 @@ const getExpenses = asyncHandler(async (req, res) => {
     .filter();
 
   let count = await countQuery.base.countDocuments(); // Get count
+
+  results.totalCount = count;
 
   // Query for pagination
   const paginationQuery = new WhereClause(
@@ -49,12 +53,34 @@ const getExpenses = asyncHandler(async (req, res) => {
     .filter()
     .pager();
 
+  if (
+    paginationQuery?.endIndex !== undefined &&
+    paginationQuery.endIndex < count
+  ) {
+    results.next = {
+      page: paginationQuery.currentPage + 1,
+      limit: paginationQuery.resultPerPage,
+    };
+  }
+
+  if (
+    paginationQuery?.startIndex !== undefined &&
+    paginationQuery.startIndex > 0
+  ) {
+    results.previous = {
+      page: paginationQuery.currentPage - 1,
+      limit: paginationQuery.resultPerPage,
+    };
+  }
+
   let expenses = await paginationQuery.base; // Get paginated results
+
+  results.expenses = expenses;
 
   if (!expenses) {
     throw new ApiError({ message: "No expenses found", status: 404 });
   }
-  res.status(200).json(new ApiResponse(200, expenses, "Expenses found."));
+  res.status(200).json(new ApiResponse(200, results, "Expenses found."));
 });
 
 const updateExpense = asyncHandler(async (req, res) => {
@@ -91,4 +117,24 @@ const deleteExpense = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200, {}, "Expense deleted succesfully"));
 });
 
-export { createExpense, getExpenses, updateExpense, deleteExpense };
+const recentExpenses = asyncHandler(async (req, res) => {
+  const userId = req.user?._id;
+
+  const expenses = await Expense.find({ createdBy: userId })
+    .sort({ _id: -1 })
+    .limit(5);
+
+  if (!expenses) {
+    throw new ApiError({ message: "No recent expenses found", status: 404 });
+  }
+
+  res.status(200).json(new ApiResponse(200, expenses, "Recent expenses found"));
+});
+
+export {
+  createExpense,
+  getExpenses,
+  updateExpense,
+  deleteExpense,
+  recentExpenses,
+};
