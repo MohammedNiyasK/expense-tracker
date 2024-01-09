@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   createExpense,
   deleteExpense,
+  getExpenseReport,
   getExpenseSummary,
   getExpenses,
   recentExpenses,
@@ -16,6 +17,7 @@ router.use(verifyJWT);
 router.route("/all").get(getExpenses);
 router.route("/recent").get(recentExpenses);
 router.route("/summary").get(getExpenseSummary);
+router.route("/report").get(getExpenseReport);
 
 router.route("/create").post(createExpense);
 

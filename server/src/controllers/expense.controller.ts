@@ -157,6 +157,13 @@ const getExpenseSummary = asyncHandler(async (req, res) => {
         totalExpenses: { $sum: "$amount" },
       },
     },
+    {
+      $group: {
+        _id: null,
+        totalExpenses: { $sum: "$totalExpenses" },
+        categories: { $push: { _id: "$_id", totalExpenes: "$totalExpenses" } },
+      },
+    },
   ]);
 
   if (!expenses) {
@@ -168,6 +175,100 @@ const getExpenseSummary = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, expenses, "Expenses found succesfully"));
 });
 
+const getExpenseReport = asyncHandler(async (req, res) => {
+  const { year, month } = req.query;
+  const userId = req.user?._id;
+
+  const expensesByCategory = await Expense.aggregate([
+    {
+      $match: {
+        createdBy: new mongoose.Types.ObjectId(userId),
+        $expr: {
+          $and: [
+            { $eq: [{ $year: "$date" }, parseInt(year as string, 10)] },
+            ...(month
+              ? [{ $eq: [{ $month: "$date" }, parseInt(month as string, 10)] }]
+              : []),
+          ],
+        },
+      },
+    },
+    {
+      $group: {
+        _id: "$category",
+        totalExpenses: { $sum: "$amount" },
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        totalExpenses: { $sum: "$totalExpenses" },
+        categories: { $push: { _id: "$_id", totalExpenses: "$totalExpenses" } },
+      },
+    },
+  ]);
+
+  if (!expensesByCategory) {
+    throw new ApiError({ message: "No expensesByCategory found", status: 404 });
+  }
+
+  const expenseData = await Expense.aggregate([
+    {
+      $match: {
+        createdBy: new mongoose.Types.ObjectId(userId),
+        $expr: {
+          $and: [
+            { $eq: [{ $year: "$date" }, parseInt(year as string, 10)] },
+            ...(month
+              ? [{ $eq: [{ $month: "$date" }, parseInt(month as string, 10)] }]
+              : []),
+          ],
+        },
+      },
+    },
+
+    ...(month
+      ? [
+          {
+            $group: {
+              _id: { $dayOfMonth: "$date" },
+              totalExpenses: { $sum: "$amount" },
+            },
+          },
+        ]
+      : [
+          {
+            $group: {
+              _id: { $month: "$date" },
+              totalExpenses: { $sum: "$amount" },
+            },
+          },
+        ]),
+
+    {
+      $group: {
+        _id: null,
+        totalExpenses: { $sum: "$totalExpenses" },
+        categories: { $push: { _id: "$_id", totalExpenses: "$totalExpenses" } },
+      },
+    },
+  ]);
+
+  if (!expenseData) {
+    throw new ApiError({ message: "No expenses found", status: 404 });
+  }
+
+  res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        { expensesByCategory, expenseData },
+        "Expenses found succesfully"
+      )
+    );
+});
+
 export {
   createExpense,
   getExpenses,
@@ -175,4 +276,5 @@ export {
   deleteExpense,
   recentExpenses,
   getExpenseSummary,
+  getExpenseReport,
 };
