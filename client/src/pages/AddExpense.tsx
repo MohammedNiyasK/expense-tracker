@@ -1,5 +1,5 @@
 const AddExpense = () => {
-  return <div>AddExpense</div>
-}
+  return <div>AddExpense</div>;
+};
 
-export default AddExpense
+export default AddExpense;
