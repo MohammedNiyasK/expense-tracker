@@ -1,8 +1,11 @@
 import { CorsOptions } from "cors";
-const allowedOrigins = ["https://www.yoursite.com", "http://localhost:5173"];
+const allowedOrigins = ["https://www.yoursite.com", "http://localhost:5173",
+"http://localhost:8000"
+];
 
 const corsOptions: CorsOptions = {
   origin: (origin, callback) => {
+    console.log(origin)
     if (!origin || allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
