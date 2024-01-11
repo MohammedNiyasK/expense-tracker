@@ -21,6 +21,8 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+import { useAppDispatch } from '@/hooks/hooks';
+import { signUpUser } from '@/redux/authSlice';
 
 const FormSchema = z.object({
   username: z.string().min(2, {
@@ -41,6 +43,7 @@ const FormSchema = z.object({
 });
 
 const SignUp = () => {
+  const dispatch = useAppDispatch();
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -50,8 +53,8 @@ const SignUp = () => {
     },
   });
 
-  function onSubmit(data: z.infer<typeof FormSchema>) {
-    console.log(data);
+  async function onSubmit(data: z.infer<typeof FormSchema>) {
+    dispatch(signUpUser(data));
 
     form.reset();
   }
