@@ -10,7 +10,7 @@ interface InitialState {
   signUpError: string | undefined;
   loading: boolean;
   signUpSuccess: string | undefined;
-  loginSuccess: string | undefined;
+  signInSuccess: string | undefined;
   success: boolean;
 }
 
@@ -36,7 +36,7 @@ const initialState: InitialState = {
     updatedAt: '',
   },
   signUpSuccess: '',
-  loginSuccess: '',
+  signInSuccess: '',
   success: false,
 };
 
@@ -50,6 +50,17 @@ export const signUpUser = createAsyncThunk(
     },
     thunkApi
   ) => await thunkHandler(http.post('/api/user/signUp', user), thunkApi)
+);
+
+export const signInUser = createAsyncThunk(
+  'user/signInUser',
+  async (
+    user: {
+      email: string;
+      password: string;
+    },
+    thunkApi
+  ) => await thunkHandler(http.post('/api/user/signIn', user), thunkApi)
 );
 
 const authSlice = createSlice({
@@ -74,6 +85,29 @@ const authSlice = createSlice({
       state.signUpError = action.payload as string;
       state.signUpSuccess = '';
       state.success = false;
+    });
+
+    builder.addCase(signInUser.pending, (state) => {
+      state.loading = true;
+    });
+
+    builder.addCase(signInUser.fulfilled, (state, action) => {
+      state.loading = false;
+      state.user = action.payload?.data?.user;
+      state.signInSuccess = action.payload?.message;
+      state.success = action.payload?.success;
+      state.accessToken = action.payload?.data?.accessToken;
+      state.refreshToken = action.payload?.data?.refreshToken;
+    });
+
+    builder.addCase(signInUser.rejected, (state, action) => {
+      state.loading = false;
+      state.user = {};
+      state.signInError = action.payload as string;
+      state.signInSuccess = '';
+      state.success = false;
+      state.refreshToken = '';
+      state.accessToken = '';
     });
   },
 });

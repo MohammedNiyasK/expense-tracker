@@ -20,8 +20,9 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { useAppDispatch } from '@/hooks/hooks';
-
+import { useAppDispatch, useAppSelector } from '@/hooks/hooks';
+import { signInUser } from '@/redux/authSlice';
+import { useNavigate } from 'react-router-dom';
 
 const FormSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -32,6 +33,9 @@ const FormSchema = z.object({
 
 const Login = () => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const { loading, success } = useAppSelector((state) => state.auth);
+
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -41,10 +45,12 @@ const Login = () => {
   });
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
-    // dispatch(signUpUser(data))
-    console.log(data);
-
+    dispatch(signInUser(data));
     form.reset();
+  }
+
+  if (success) {
+    navigate('/', { replace: true });
   }
   return (
     <div className="container mx-auto flex min-h-screen items-center justify-center px-6">
@@ -89,7 +95,7 @@ const Login = () => {
                 )}
               />
               <Button type="submit" className="w-full">
-                Login
+                {loading ? 'Loading ...' : 'Login'}
               </Button>
             </form>
           </Form>

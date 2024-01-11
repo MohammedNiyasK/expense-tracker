@@ -11,6 +11,7 @@ export const http = axios.create({
 export const thunkHandler = async (asynFn: any, thunkApi: any) => {
   try {
     const response = await asynFn;
+    console.log(response.data);
     return response.data;
   } catch (error: any) {
     return thunkApi.rejectWithValue(error.response.data.message);
