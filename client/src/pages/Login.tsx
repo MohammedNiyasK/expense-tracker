@@ -23,6 +23,7 @@ import {
 import { useAppDispatch, useAppSelector } from '@/hooks/hooks';
 import { signInUser } from '@/redux/authSlice';
 import { useNavigate } from 'react-router-dom';
+import { RootState } from '@/redux/store';
 
 const FormSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -34,7 +35,7 @@ const FormSchema = z.object({
 const Login = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { loading, success } = useAppSelector((state) => state.auth);
+  const { loading, success } = useAppSelector((state: RootState) => state.auth);
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),

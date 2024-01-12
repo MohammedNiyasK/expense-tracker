@@ -21,8 +21,10 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { useAppDispatch } from '@/hooks/hooks';
+import { useAppDispatch, useAppSelector } from '@/hooks/hooks';
 import { signUpUser } from '@/redux/authSlice';
+import { useNavigate } from 'react-router-dom';
+import ButtonLoadingSpinner from '@/components/loader/ButtonLoadingSpinner';
 
 const FormSchema = z.object({
   username: z.string().min(2, {
@@ -44,6 +46,10 @@ const FormSchema = z.object({
 
 const SignUp = () => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const { loading, signUpSuccess, success, signUpError } = useAppSelector(
+    (state) => state.auth
+  );
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -54,8 +60,11 @@ const SignUp = () => {
   });
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
-    dispatch(signUpUser(data));
+    await dispatch(signUpUser(data));
 
+    if (success) {
+      navigate('/signin');
+    }
     form.reset();
   }
   return (
@@ -116,8 +125,12 @@ const SignUp = () => {
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full">
-                Create account
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? (
+                  <ButtonLoadingSpinner loadingText="Signing up.." />
+                ) : (
+                  <span>Create account</span>
+                )}
               </Button>
             </form>
           </Form>
