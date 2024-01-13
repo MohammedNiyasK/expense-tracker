@@ -1,6 +1,4 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { thunkHandler } from '@/utils/api';
-import { http } from '@/utils/api';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface InitialState {
   user: User | {};
@@ -8,108 +6,97 @@ interface InitialState {
   accessToken: string | undefined;
   signInError: string | undefined;
   signUpError: string | undefined;
-  loading: boolean;
-  signUpSuccess: string | undefined;
-  signInSuccess: string | undefined;
-  success: boolean;
+  successMessage: string | undefined;
 }
 
 interface User {
   _id: string;
   username: string;
   email: string;
-  createdAt: string;
-  updatedAt: string;
+}
+
+interface Payload {
+  data: {
+    user: User;
+    accessToken: string;
+    refreshToken: string;
+  };
+  message: string;
 }
 
 const initialState: InitialState = {
-  loading: false,
+  user: {},
   refreshToken: '',
   accessToken: '',
   signInError: '',
   signUpError: '',
-  user: {
-    _id: '',
-    username: '',
-    email: '',
-    createdAt: '',
-    updatedAt: '',
-  },
-  signUpSuccess: '',
-  signInSuccess: '',
-  success: false,
+  successMessage: '',
 };
 
-export const signUpUser = createAsyncThunk(
-  'user/signUpUser',
-  async (
-    user: {
-      username: string;
-      email: string;
-      password: string;
-    },
-    thunkApi
-  ) => await thunkHandler(http.post('/api/user/signUp', user), thunkApi)
-);
-
-export const signInUser = createAsyncThunk(
-  'user/signInUser',
-  async (
-    user: {
-      email: string;
-      password: string;
-    },
-    thunkApi
-  ) => await thunkHandler(http.post('/api/user/signIn', user), thunkApi)
-);
-
 const authSlice = createSlice({
-  name: 'user',
+  name: 'auth',
   initialState,
-  reducers: {},
-  extraReducers: (builder) => {
-    builder.addCase(signUpUser.pending, (state) => {
-      state.loading = true;
-    });
+  reducers: {
+    SIGNUP_SUCCESS: (state, action: PayloadAction<string>) => {
+      state.signInError = '';
+      state.signUpError = '';
+      state.successMessage = action.payload;
+    },
+    SIGNUP_FAIL: (state, action: PayloadAction<string>) => {
+      state.successMessage = '';
+      state.signInError = '';
+      state.signUpError = action.payload;
+    },
+    CLEAR_MESSAGE: (state) => {
+      state.successMessage = '';
+      state.signInError = '';
+      state.signUpError = '';
+    },
+    SIGNIN_SUCCESS: (state, action: PayloadAction<Payload>) => {
+      state.user = action.payload.data.user;
+      state.refreshToken = action.payload.data.refreshToken;
+      state.accessToken = action.payload.data.accessToken;
+      state.signInError = '';
+      state.signUpError = '';
+      state.successMessage = action.payload.message;
+    },
 
-    builder.addCase(signUpUser.fulfilled, (state, action) => {
-      state.loading = false;
-      state.user = action.payload?.data;
-      state.signUpSuccess = action.payload?.message;
-      state.success = action.payload?.success;
-    });
-
-    builder.addCase(signUpUser.rejected, (state, action) => {
-      state.loading = false;
+    SIGNIN_FAIL: (state, action: PayloadAction<string>) => {
       state.user = {};
-      state.signUpError = action.payload as string;
-      state.signUpSuccess = '';
-      state.success = false;
-    });
-
-    builder.addCase(signInUser.pending, (state) => {
-      state.loading = true;
-    });
-
-    builder.addCase(signInUser.fulfilled, (state, action) => {
-      state.loading = false;
-      state.user = action.payload?.data?.user;
-      state.signInSuccess = action.payload?.message;
-      state.success = action.payload?.success;
-      state.accessToken = action.payload?.data?.accessToken;
-      state.refreshToken = action.payload?.data?.refreshToken;
-    });
-
-    builder.addCase(signInUser.rejected, (state, action) => {
-      state.loading = false;
-      state.user = {};
-      state.signInError = action.payload as string;
-      state.signInSuccess = '';
-      state.success = false;
       state.refreshToken = '';
       state.accessToken = '';
-    });
+      state.signInError = action.payload;
+      state.signUpError = '';
+      state.successMessage = '';
+    },
+    SETUSER_PROFILE: (state, action) => {
+      state.user = action.payload.user;
+      state.accessToken = action.payload.accessToken;
+      state.refreshToken = action.payload.refreshToken;
+    },
+    REFRESH_TOKEN_SUCCESS: (state, action) => {
+      state.accessToken = action.payload.accessToken;
+      state.refreshToken = action.payload.refreshToken;
+    },
+    REFRESH_TOKEN_FAIL: (state) => {
+      state.user = {};
+      state.accessToken = '';
+      state.refreshToken = '';
+      state.signInError = '';
+      state.signUpError = '';
+      state.successMessage = '';
+    },
   },
 });
 
 export default authSlice.reducer;
+export const {
+  SIGNUP_SUCCESS,
+  SIGNUP_FAIL,
+  CLEAR_MESSAGE,
+  SIGNIN_SUCCESS,
+  SIGNIN_FAIL,
+  SETUSER_PROFILE,
+  REFRESH_TOKEN_SUCCESS,
+  REFRESH_TOKEN_FAIL,
+} = authSlice.actions;

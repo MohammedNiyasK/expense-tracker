@@ -1,4 +1,15 @@
 import axios from 'axios';
+import { useMutation } from '@tanstack/react-query';
+
+interface User {
+  username: string;
+  email: string;
+  password: string;
+}
+interface SignIn {
+  email: string;
+  password: string;
+}
 
 export const http = axios.create({
   baseURL: import.meta.env.VITE_BASE_URL,
@@ -8,12 +19,26 @@ export const http = axios.create({
   },
 });
 
-export const thunkHandler = async (asynFn: any, thunkApi: any) => {
-  try {
-    const response = await asynFn;
-    console.log(response.data);
-    return response.data;
-  } catch (error: any) {
-    return thunkApi.rejectWithValue(error.response.data.message);
-  }
-};
+
+function signUp() {
+  return useMutation({
+    mutationFn: async (user: User) => {
+      const { data } = await http.post('/api/user/signup', user);
+      console.log(data);
+      return data;
+    },
+  });
+}
+
+function signIn() {
+  return useMutation({
+    mutationFn: async (user: SignIn) => {
+      const { data } = await http.post('/api/user/signin', user);
+      console.log(data);
+      return data;
+    },
+  });
+}
+
+
+export { signUp, signIn };

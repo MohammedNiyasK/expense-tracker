@@ -11,6 +11,7 @@ import { Link } from 'react-router-dom';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
+import { Cross2Icon } from '@radix-ui/react-icons';
 
 import {
   Form,
@@ -22,9 +23,11 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { useAppDispatch, useAppSelector } from '@/hooks/hooks';
-import { signUpUser } from '@/redux/authSlice';
+import { SIGNUP_SUCCESS, SIGNUP_FAIL, CLEAR_MESSAGE } from '@/redux/authSlice';
 import { useNavigate } from 'react-router-dom';
 import ButtonLoadingSpinner from '@/components/loader/ButtonLoadingSpinner';
+import { signUp } from '@/utils/api';
+import { useMemo } from 'react';
 
 const FormSchema = z.object({
   username: z.string().min(2, {
@@ -47,9 +50,18 @@ const FormSchema = z.object({
 const SignUp = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { loading, signUpSuccess, success, signUpError } = useAppSelector(
-    (state) => state.auth
-  );
+
+  let {
+    mutateAsync: signUpUser,
+    data,
+    isPending,
+    isError,
+    isSuccess,
+    error,
+  } = signUp();
+
+  const { signUpError } = useAppSelector((state) => state.auth);
+
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -59,14 +71,32 @@ const SignUp = () => {
     },
   });
 
-  async function onSubmit(data: z.infer<typeof FormSchema>) {
-    await dispatch(signUpUser(data));
-
-    if (success) {
-      navigate('/signin');
+  async function onSubmit(user: z.infer<typeof FormSchema>) {
+    try {
+      await signUpUser(user);
+    } catch (error: any) {
+      console.log(error);
+      return;
     }
+
     form.reset();
   }
+
+  const handleClearError = () => {
+    dispatch(CLEAR_MESSAGE());
+  };
+
+  if (isSuccess) {
+    dispatch(SIGNUP_SUCCESS(data.message));
+    navigate('/signin');
+  }
+
+  useMemo(() => {
+    if (isError) {
+      dispatch(SIGNUP_FAIL((error as any).response.data.message));
+    }
+  }, [isError]);
+
   return (
     <div className="container mx-auto flex min-h-screen items-center justify-center px-6">
       <Card>
@@ -76,6 +106,23 @@ const SignUp = () => {
             Enter your email below to create your account
           </CardDescription>
         </CardHeader>
+        {signUpError ? (
+          <div
+            className="m-5 flex items-center rounded border border-red-400 bg-red-100 px-4 py-3 text-red-700"
+            role="alert"
+          >
+            <span className="ml-2 block sm:inline">{signUpError} </span>
+            <button
+              className="ml-auto font-bold text-red-700"
+              onClick={handleClearError}
+            >
+              <Cross2Icon />
+            </button>
+          </div>
+        ) : (
+          ''
+        )}
+
         <CardContent className="grid gap-4">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -125,8 +172,8 @@ const SignUp = () => {
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? (
+              <Button type="submit" className="w-full" disabled={isPending}>
+                {isPending ? (
                   <ButtonLoadingSpinner loadingText="Signing up.." />
                 ) : (
                   <span>Create account</span>

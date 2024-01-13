@@ -4,6 +4,10 @@ import CommonLoading from './components/loader/CommonLoading';
 import App from './App';
 import { Provider } from 'react-redux';
 import { store } from './redux/store';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+
+const queryClient = new QueryClient();
 
 const ErrorComponent = ({ errorMessage }: { errorMessage: string | null }) => (
   <div className="text-red-500 font-bold text-center">{errorMessage}</div>
@@ -36,11 +40,12 @@ const AppContainer = () => {
   }
 
   return (
-    <div>
+    <QueryClientProvider client={queryClient}>
       <Provider store={store}>
         <App />
       </Provider>
-    </div>
+      <ReactQueryDevtools initialIsOpen={false} />
+    </QueryClientProvider>
   );
 };
 
