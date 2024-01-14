@@ -19,7 +19,6 @@ export const http = axios.create({
   },
 });
 
-
 function signUp() {
   return useMutation({
     mutationFn: async (user: User) => {
@@ -39,6 +38,5 @@ function signIn() {
     },
   });
 }
-
 
 export { signUp, signIn };
