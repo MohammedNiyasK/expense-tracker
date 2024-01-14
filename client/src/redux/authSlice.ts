@@ -9,7 +9,7 @@ interface InitialState {
   successMessage: string | undefined;
 }
 
-interface User {
+export interface User {
   _id: string;
   username: string;
   email: string;

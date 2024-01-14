@@ -1,8 +1,11 @@
 import { NavLink, Link } from 'react-router-dom';
 import { Button } from '../ui/button';
 import { useState } from 'react';
+import { useAppSelector } from '@/hooks/hooks';
+import { User } from '@/redux/authSlice';
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user } = useAppSelector((state) => state.auth);
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
@@ -19,7 +22,7 @@ const Navbar = () => {
         </Link>
         <div className="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
           <small className="hidden lg:block text-sm font-medium leading-none py-2 px-3">
-            Niyas
+            {(user as User).username}
           </small>
           <Button>Logout</Button>
 
