@@ -1,5 +1,5 @@
-import { Button } from './components/ui/button';
-import { lazy, Suspense } from 'react';
+
+import { Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import SignUp from './pages/SignUp';
 import Login from './pages/Login';

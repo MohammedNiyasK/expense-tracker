@@ -5,14 +5,7 @@ import { PieChart, Pie, Legend, Tooltip, ResponsiveContainer } from 'recharts';
   totalExpenes:number
 }
 
-const data01 = [
-  { name: 'Group A', value: 400, fill: '#8884d8' },
-  { name: 'Group B', value: 300, fill: '#42A5F5' },
-  { name: 'Group C', value: 300, fill: '#F5B041' },
-  { name: 'Group D', value: 200, fill: '#66BB6A' },
-  { name: 'Group E', value: 278, fill: '#E57373' },
-  { name: 'Group F', value: 189, fill: '#26C6DA' },
-];
+
 
 const ExpensePieChart: React.FC<{ chartData: Data[] }> = ({chartData}) => {
   const colors = ['#ff00ff', '#42A5F5', '#0000ff', '#F5B041'];

@@ -1,5 +1,4 @@
 import { Card, CardHeader, CardContent, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import {
   Select,
@@ -34,7 +33,7 @@ const Report = () => {
   const [selectedMonth, setSelectedMonth] = useState('');
   const [selectedYear, setSelectedYear] = useState('2024');
 
-  const { data, isLoading, isError, error } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ['report'],
     queryFn: getReport,
   });

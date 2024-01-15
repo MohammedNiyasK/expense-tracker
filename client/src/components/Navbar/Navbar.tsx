@@ -6,7 +6,6 @@ import { User } from '@/redux/authSlice';
 import { logout } from '@/utils/api';
 import { useAppDispatch } from '@/hooks/hooks';
 import { LOGOUT } from '@/redux/authSlice';
-import { Navigate } from 'react-router-dom';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);

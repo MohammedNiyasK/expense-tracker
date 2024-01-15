@@ -18,7 +18,7 @@ import { getAllExpense } from '@/utils/api';
 const History = () => {
   const [selectedValue, setSelectedValue] = useState<string>('');
 
-  const { data, isLoading, isError, error } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ['all_expenses'],
     queryFn: getAllExpense,
   });
@@ -26,6 +26,8 @@ const History = () => {
   const handleChange = (newValue: string) => {
     setSelectedValue(newValue);
   };
+
+  console.log(selectedValue)
 
   return (
     <div className="mt-20 mx-5">

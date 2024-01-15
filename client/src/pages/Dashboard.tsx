@@ -7,7 +7,7 @@ import CommonLoading from '@/components/loader/CommonLoading';
 
 
 const Dashboard = () => {
-  const { data, isLoading, isError, error } = useQuery({
+  const { data, isLoading} = useQuery({
     queryKey: ['recent_expenses'],
     queryFn: recent,
   });
