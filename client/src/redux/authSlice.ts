@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { refreshTokenAction } from '@/utils/api';
 
 interface InitialState {
   user: User | {};
@@ -7,6 +8,7 @@ interface InitialState {
   signInError: string | undefined;
   signUpError: string | undefined;
   successMessage: string | undefined;
+  isLoading: boolean;
 }
 
 export interface User {
@@ -31,6 +33,7 @@ const initialState: InitialState = {
   signInError: '',
   signUpError: '',
   successMessage: '',
+  isLoading: false,
 };
 
 const authSlice = createSlice({
@@ -86,6 +89,26 @@ const authSlice = createSlice({
       state.signUpError = '';
       state.successMessage = '';
     },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(refreshTokenAction.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(refreshTokenAction.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.user = action.payload.data.user;
+        state.refreshToken = action.payload.data.refreshToken;
+        state.accessToken = action.payload.data.accessToken;
+      })
+      .addCase(refreshTokenAction.rejected, (state) => {
+        state.user = {};
+        state.accessToken = '';
+        state.refreshToken = '';
+        state.signInError = '';
+        state.signUpError = '';
+        state.successMessage = '';
+      });
   },
 });
 

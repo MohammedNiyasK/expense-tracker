@@ -64,7 +64,7 @@ const Navbar = () => {
                 className={({ isActive }) =>
                   isActive
                     ? 'block py-2 px-3 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 md:dark:text-blue-500'
-                    : 'block py-2 px-3 text-white  rounded md:bg-transparent md:text-gray-900 md:p-0 md:dark:text-blue-500'
+                    : 'block py-2 px-3 text-gray-900  rounded md:bg-transparent md:text-gray-900 md:p-0 md:dark:text-blue-500'
                 }
                 aria-current="page"
               >
@@ -96,7 +96,7 @@ const Navbar = () => {
               </NavLink>
             </li>
             <li className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hidden">
-              Niyas
+              {(user as User).username}
             </li>
           </ul>
         </div>

@@ -6,6 +6,8 @@ import Login from './pages/Login';
 import PrivateRoute from './PrivateRoute';
 import Dashboard from './pages/Dashboard';
 import Layout from './components/Layout';
+import History from './pages/History';
+import Report from './pages/Report';
 
 function App() {
   return (
@@ -20,6 +22,22 @@ function App() {
               element={
                 <PrivateRoute>
                   <Dashboard />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/transactions"
+              element={
+                <PrivateRoute>
+                  <History />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/reports"
+              element={
+                <PrivateRoute>
+                  <Report />
                 </PrivateRoute>
               }
             />

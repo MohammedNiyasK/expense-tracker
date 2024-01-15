@@ -1,5 +1,6 @@
 import axios from 'axios';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { createAsyncThunk } from '@reduxjs/toolkit';
 
 interface User {
   username: string;
@@ -19,6 +20,36 @@ export const http = axios.create({
   },
 });
 
+const API = axios.create();
+
+API.interceptors.request.use(
+  (config) => {
+    const profile = localStorage.getItem('profile');
+
+    if (profile) {
+      const parsedProfile = JSON.parse(profile);
+
+      const accessToken = parsedProfile.accessToken;
+      config.headers.Authorization = `Bearer ${accessToken}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+const refreshTokenAction = createAsyncThunk(
+  'auth/refreshToken',
+  async (refreshToken: string) => {
+    const response = await http.post('/api/user/refresh-token', {
+      refreshToken,
+    });
+    localStorage.setItem('profile', JSON.stringify(response.data));
+    return response.data;
+  }
+);
+
 function signUp() {
   return useMutation({
     mutationFn: async (user: User) => {
@@ -33,10 +64,15 @@ function signIn() {
   return useMutation({
     mutationFn: async (user: SignIn) => {
       const { data } = await http.post('/api/user/signin', user);
-      console.log(data);
       return data;
     },
   });
 }
 
-export { signUp, signIn };
+async function recent() {
+  const { data } = await API.get('/api/expense/recent');
+  console.log(data);
+  return data;
+}
+
+export { signUp, signIn, refreshTokenAction, recent };
