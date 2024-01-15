@@ -252,6 +252,21 @@ const getExpenseReport = asyncHandler(async (req, res) => {
         categories: { $push: { _id: "$_id", totalExpenses: "$totalExpenses" } },
       },
     },
+    {
+      $unwind: "$categories",
+    },
+    {
+      $sort: {
+        "categories._id": 1,
+      },
+    },
+    {
+      $group: {
+        _id: "$_id",
+        totalExpenses: { $first: "$totalExpenses" },
+        categories: { $push: "$categories" },
+      },
+    },
   ]);
 
   if (!expenseData) {
@@ -263,7 +278,7 @@ const getExpenseReport = asyncHandler(async (req, res) => {
     .json(
       new ApiResponse(
         200,
-        { expensesByCategory, expenseData },
+        { expensesByCategory, expenseData,year,month },
         "Expenses found succesfully"
       )
     );
