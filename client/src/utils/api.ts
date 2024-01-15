@@ -20,7 +20,9 @@ export const http = axios.create({
   },
 });
 
-const API = axios.create();
+const API = axios.create({
+  baseURL: import.meta.env.VITE_BASE_URL, 
+});
 
 API.interceptors.request.use(
   (config) => {
