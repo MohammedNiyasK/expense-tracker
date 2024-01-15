@@ -11,6 +11,9 @@ import {
 import { useState } from 'react';
 import ExpenseCard from '@/components/ExpenseCard/ExpenseCard';
 import BarChart from '@/components/BarChart/BarChart';
+import { useQuery } from '@tanstack/react-query';
+import { getReport } from '@/utils/api';
+import CommonLoading from '@/components/loader/CommonLoading';
 
 const months = [
   'Jan',
@@ -30,6 +33,11 @@ const months = [
 const Report = () => {
   const [selectedMonth, setSelectedMonth] = useState('');
   const [selectedYear, setSelectedYear] = useState('2024');
+
+  const { data, isLoading, isError, error } = useQuery({
+    queryKey: ['report'],
+    queryFn: getReport,
+  });
 
   const handleMonthChange = (newValue: string) => {
     setSelectedMonth(newValue);
@@ -81,10 +89,27 @@ const Report = () => {
         </div>
 
         <div className="my-10 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <ExpenseCard />
-          <ExpenseCard />
-          <ExpenseCard />
-          <ExpenseCard />
+        {
+  isLoading ? (
+    <div className="flex items-center justify-center h-screen">
+      <CommonLoading />
+    </div>
+  ) : (
+    data?.data.expensesByCategory[0].categories.length > 0 ? (
+      data?.data.expensesByCategory[0].categories.map((data:{_id:string,totalExpenses:number}) => (
+        <ExpenseCard
+          key={data._id} 
+          title={data._id}
+          amount={data.totalExpenses}
+        />
+      ))
+    ) : (
+      <div className="text-center py-4">
+        <p>No expenses found.</p>
+      </div>
+    )
+  )
+}
         </div>
         <Card className="col-span-4 mb-10">
           <CardHeader>

@@ -6,11 +6,11 @@ import {
   CardTitle,
 } from '../ui/card';
 
-const ExpenseCard = () => {
+const ExpenseCard = ({title,amount}:{title:string,amount:number}) => {
   return (
-    <Card>
+    <Card key={title}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+        <CardTitle className="text-sm font-medium">{title}</CardTitle>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
@@ -25,8 +25,7 @@ const ExpenseCard = () => {
         </svg>
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold">$45,231.89</div>
-        <p className="text-xs text-muted-foreground">+20.1% from last month</p>
+        <div className="text-2xl font-bold">${amount}</div>
       </CardContent>
     </Card>
   );

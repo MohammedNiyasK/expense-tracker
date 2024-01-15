@@ -11,9 +11,17 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import CommonLoading from '@/components/loader/CommonLoading';
+import { getAllExpense } from '@/utils/api';
 
 const History = () => {
   const [selectedValue, setSelectedValue] = useState<string>('');
+
+  const { data, isLoading, isError, error } = useQuery({
+    queryKey: ['all_expenses'],
+    queryFn: getAllExpense,
+  });
 
   const handleChange = (newValue: string) => {
     setSelectedValue(newValue);
@@ -40,7 +48,14 @@ const History = () => {
             <Button type="submit">search</Button>
           </div>
         </div>
-        <DataTable />
+        {isLoading ? (
+          <div className="flex items-center justify-center h-screen">
+
+            <CommonLoading />
+          </div>
+        ) : (
+          data && <DataTable expenses={data.data.expenses} />
+        )}
       </Card>
     </div>
   );

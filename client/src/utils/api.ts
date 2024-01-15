@@ -74,5 +74,29 @@ async function recent() {
   console.log(data);
   return data;
 }
+async function getSummary() {
+  const { data } = await API.get('/api/expense/summary');
+  return data;
+}
+async function getAllExpense() {
+  const { data } = await API.get('/api/expense/all');
+  console.log(data);
+  return data;
+}
 
-export { signUp, signIn, refreshTokenAction, recent };
+async function getReport() {
+  const { data } = await API.get('/api/expense/report?year=2024&month=1');
+  console.log(data);
+  return data;
+}
+
+ const logout = async () => {
+  try {
+    const { data }  = await API.post("/api/user/logout");
+    return data
+  } catch (error) {
+    console.log(error)
+  }
+};
+
+export { signUp, signIn, refreshTokenAction, recent,getSummary,getAllExpense,getReport,logout};
