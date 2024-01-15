@@ -6,6 +6,7 @@ import { Provider } from 'react-redux';
 import { store } from './redux/store';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { http } from './utils/api';
 
 const queryClient = new QueryClient();
 
@@ -20,7 +21,7 @@ const AppContainer = () => {
   useEffect(() => {
     const checkServerStatus = async () => {
       try {
-        await axios.get('/api/server-status');
+        await http.get('/api/server-status');
       } catch (err) {
         setError('Server is down. Please try again later.');
       } finally {
