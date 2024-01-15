@@ -1,21 +1,17 @@
 import { PieChart, Pie, Legend, Tooltip, ResponsiveContainer } from 'recharts';
 
- interface Data {
+interface Data {
   _id: string;
-  totalExpenes:number
+  totalExpenes: number;
 }
 
-
-
-const ExpensePieChart: React.FC<{ chartData: Data[] }> = ({chartData}) => {
+const ExpensePieChart: React.FC<{ chartData: Data[] }> = ({ chartData }) => {
   const colors = ['#ff00ff', '#42A5F5', '#0000ff', '#F5B041'];
 
-  const dataWithColors = chartData.map((item,index) => (
-    {
-      ...item,
-      fill:colors[index]
-    }
-  ))
+  const dataWithColors = chartData.map((item, index) => ({
+    ...item,
+    fill: colors[index],
+  }));
   return (
     <ResponsiveContainer width="100%" height={350} className="mb-8">
       <PieChart width={400} height={400}>

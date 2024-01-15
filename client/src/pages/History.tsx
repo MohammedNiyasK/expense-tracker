@@ -27,7 +27,7 @@ const History = () => {
     setSelectedValue(newValue);
   };
 
-  console.log(selectedValue)
+  console.log(selectedValue);
 
   return (
     <div className="mt-20 mx-5">
@@ -52,11 +52,14 @@ const History = () => {
         </div>
         {isLoading ? (
           <div className="flex items-center justify-center h-screen">
-
             <CommonLoading />
           </div>
+        ) : data?.data?.expenses?.length > 0 ? (
+          <DataTable expenses={data.data.expenses} />
         ) : (
-          data && <DataTable expenses={data.data.expenses} />
+          <div className="text-center py-4">
+            <p>No expenses data available to display.</p>
+          </div>
         )}
       </Card>
     </div>

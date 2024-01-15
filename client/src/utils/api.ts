@@ -21,7 +21,7 @@ export const http = axios.create({
 });
 
 const API = axios.create({
-  baseURL: import.meta.env.VITE_BASE_URL, 
+  baseURL: import.meta.env.VITE_BASE_URL,
 });
 
 API.interceptors.request.use(
@@ -92,13 +92,22 @@ async function getReport() {
   return data;
 }
 
- const logout = async () => {
+const logout = async () => {
   try {
-    const { data }  = await API.post("/api/user/logout");
-    return data
+    const { data } = await API.post('/api/user/logout');
+    return data;
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
 };
 
-export { signUp, signIn, refreshTokenAction, recent,getSummary,getAllExpense,getReport,logout};
+export {
+  signUp,
+  signIn,
+  refreshTokenAction,
+  recent,
+  getSummary,
+  getAllExpense,
+  getReport,
+  logout,
+};

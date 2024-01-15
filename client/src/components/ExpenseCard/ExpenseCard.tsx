@@ -1,11 +1,6 @@
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '../ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 
-const ExpenseCard = ({title,amount}:{title:string,amount:number}) => {
+const ExpenseCard = ({ title, amount }: { title: string; amount: number }) => {
   return (
     <Card key={title}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

@@ -10,28 +10,25 @@ import { LOGOUT } from '@/redux/authSlice';
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user } = useAppSelector((state) => state.auth);
-  const navigate = useNavigate()
-  const dispatch = useAppDispatch()
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
   const handleLogout = async () => {
     try {
-
-      const data = await logout()
-      console.log(data)
-      if(data.success){
-        localStorage.removeItem("profile");
-        dispatch(LOGOUT())
-        navigate("/signin",{replace:true})
+      const data = await logout();
+      console.log(data);
+      if (data.success) {
+        localStorage.removeItem('profile');
+        dispatch(LOGOUT());
+        navigate('/signin', { replace: true });
       }
-
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-   
-  }
+  };
   return (
     <nav className="bg-white dark:bg-gray-900 fixed w-full z-20 top-0 start-0 border-b border-gray-200 dark:border-gray-600">
       <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
@@ -47,9 +44,7 @@ const Navbar = () => {
           <small className="hidden lg:block text-sm font-medium leading-none py-2 px-3">
             {(user as User).username}
           </small>
-          <Button
-          onClick={handleLogout}
-          >Logout</Button>
+          <Button onClick={handleLogout}>Logout</Button>
 
           <button
             onClick={toggleMenu}

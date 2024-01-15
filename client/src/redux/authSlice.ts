@@ -89,14 +89,14 @@ const authSlice = createSlice({
       state.signUpError = '';
       state.successMessage = '';
     },
-    LOGOUT:(state) => {
+    LOGOUT: (state) => {
       state.user = {};
       state.accessToken = '';
       state.refreshToken = '';
       state.signInError = '';
       state.signUpError = '';
       state.successMessage = '';
-    }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -130,5 +130,5 @@ export const {
   SETUSER_PROFILE,
   REFRESH_TOKEN_SUCCESS,
   REFRESH_TOKEN_FAIL,
-  LOGOUT
+  LOGOUT,
 } = authSlice.actions;
