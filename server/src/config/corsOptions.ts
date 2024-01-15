@@ -1,5 +1,5 @@
 import { CorsOptions } from "cors";
-const allowedOrigins = ["https://expense-tracker-client-bb3ateqr7-mohammedniyask.vercel.app", "http://localhost:5173",
+const allowedOrigins = ["https://expense-tracker-6ish.vercel.app", "http://localhost:5173",
 "http://localhost:8000"
 ];
 
