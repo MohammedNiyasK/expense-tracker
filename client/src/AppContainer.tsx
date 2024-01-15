@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import CommonLoading from './components/loader/CommonLoading';
 import App from './App';
 import { Provider } from 'react-redux';
