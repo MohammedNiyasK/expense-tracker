@@ -161,13 +161,13 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     process.env.REFRESH_TOKEN_SECRET as string
   ) as Token;
 
-  const user = await User.findById(decodedToken?._id);
+  const findUser = await User.findById(decodedToken?._id);
 
-  if (!user) {
+  if (!findUser) {
     throw new ApiError({ message: "Invalid refresh token", status: 401 });
   }
 
-  if (incomingRefreshToken !== user?.refreshToken) {
+  if (incomingRefreshToken !== findUser?.refreshToken) {
     throw new ApiError({
       message: "Refresh token expired or used",
       status: 401,
@@ -175,8 +175,12 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
   }
 
   const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(
-    user?._id
+    findUser?._id
   );
+
+  const user = await User.findById(findUser._id).select(
+    "-password -refreshToken"
+  )
 
   const options = {
     httpOnly: true,
@@ -190,7 +194,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     .json(
       new ApiResponse(
         200,
-        { accessToken, refreshToken },
+        { user, accessToken, refreshToken },
         "Access token refreshed"
       )
     );
