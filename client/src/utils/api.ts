@@ -19,6 +19,11 @@ interface Expense {
   date: string;
 }
 
+interface UpdateExpenseVariable {
+  updatedExpense:Expense
+  id:string
+}
+
 export const http = axios.create({
   baseURL: import.meta.env.VITE_BASE_URL,
   headers: {
@@ -118,20 +123,19 @@ const addExpense = () => {
     },
   });
 };
-// const editExpense = () => {
-
-//   const queryClient = useQueryClient()
-//   return useMutation({
-//     mutationFn: async (id: string) => {
-//       const {data} = await API.put(`/api/expense/:${id}`)
-//       return data
-//     },
-//     onSuccess:() => {
-//       queryClient.invalidateQueries();
-//     }
-//   },
-//   );
-// }
+const editExpense = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async ({id,updatedExpense}:UpdateExpenseVariable) => {
+      const {data} = await API.put(`/api/expense/${id}`,updatedExpense)
+      return data
+    },
+    onSuccess:() => {
+      queryClient.invalidateQueries();
+    }
+  },
+  );
+}
 
 const deleteExpense = () => {
   const queryClient = useQueryClient();
@@ -157,4 +161,5 @@ export {
   logout,
   addExpense,
   deleteExpense,
+  editExpense
 };

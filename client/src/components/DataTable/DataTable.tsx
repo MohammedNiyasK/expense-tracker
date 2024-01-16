@@ -10,6 +10,7 @@ import { TrashIcon, Pencil1Icon } from '@radix-ui/react-icons';
 import { Button } from '../ui/button';
 import { parseISO, format } from 'date-fns';
 import { deleteExpense } from '@/utils/api';
+import { EditExpenseType } from '@/pages/EditExpense';
 
 export interface Expense {
   _id: string;
@@ -19,7 +20,8 @@ export interface Expense {
   category: string;
 }
 
-const DataTable: React.FC<{ expenses: Expense[] }> = ({ expenses }) => {
+
+const DataTable: React.FC<{ expenses: Expense[],setIsEditClicked: React.Dispatch<React.SetStateAction<boolean>>,setSelectedExpense: React.Dispatch<React.SetStateAction<Expense | null>> }> = ({ expenses,setIsEditClicked,setSelectedExpense }) => {
   const { mutateAsync: deleteOneExpense } = deleteExpense();
 
   const handleDeleteExpense = async (id: string) => {
@@ -29,6 +31,15 @@ const DataTable: React.FC<{ expenses: Expense[] }> = ({ expenses }) => {
       console.log(error);
     }
   };
+
+  const handleEditClick = (expense:Expense) => {
+    
+    setIsEditClicked(true)
+    setSelectedExpense(expense)
+
+  }
+
+
 
   return (
     <div className="overflow-x-auto max-w-[1200px] pl-5">
@@ -57,7 +68,7 @@ const DataTable: React.FC<{ expenses: Expense[] }> = ({ expenses }) => {
                   <Button
                     variant="ghost"
                     className="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
-                    onClick={() => console.log('edit:', expense._id)}
+                    onClick={() => handleEditClick(expense)}
                   >
                     <Pencil1Icon className="h-4 w-4" />
                   </Button>
