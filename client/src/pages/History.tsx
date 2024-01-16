@@ -13,10 +13,15 @@ import {
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import CommonLoading from '@/components/loader/CommonLoading';
-import { getAllExpense } from '@/utils/api';
+import { getAllExpense, editExpense } from '@/utils/api';
+import { Expense } from '@/components/DataTable/DataTable';
+import EditExpense from './EditExpense';
+import { EditExpenseType } from './EditExpense';
 
 const History = () => {
   const [selectedValue, setSelectedValue] = useState<string>('');
+  const [isEditClicked, setIsEditClicked] = useState(false);
+  const [selectedExpense, setSelectedExpense] = useState<Expense | null>(null);
 
   const { data, isLoading } = useQuery({
     queryKey: ['all_expenses'],
@@ -28,6 +33,15 @@ const History = () => {
   };
 
   console.log(selectedValue);
+
+  const mutation = editExpense();
+
+  const handleSaveExpense = async (
+    updatedExpense: EditExpenseType,
+    id: string
+  ) => {
+    await mutation.mutateAsync({ id, updatedExpense });
+  };
 
   return (
     <div className="mt-20 mx-5">
@@ -55,13 +69,24 @@ const History = () => {
             <CommonLoading />
           </div>
         ) : data?.data?.expenses?.length > 0 ? (
-          <DataTable expenses={data.data.expenses} />
+          <DataTable
+            expenses={data.data.expenses}
+            setSelectedExpense={setSelectedExpense}
+            setIsEditClicked={setIsEditClicked}
+          />
         ) : (
           <div className="text-center py-4">
             <p>No expenses data available to display.</p>
           </div>
         )}
       </Card>
+      {isEditClicked && (
+        <EditExpense
+          setIsEditClicked={setIsEditClicked}
+          selectedExpense={selectedExpense}
+          onSave={handleSaveExpense}
+        />
+      )}
     </div>
   );
 };

@@ -249,9 +249,7 @@ const EditExpense = ({
               </FormItem>
             )}
           />
-          <Button type="submit">
-            Edit Expense
-          </Button>
+          <Button type="submit">Edit Expense</Button>
           <Button
             variant="outline"
             className="ml-5"
