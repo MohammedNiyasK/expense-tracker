@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CalendarIcon, CaretSortIcon, CheckIcon } from '@radix-ui/react-icons';
-import { format,parseISO } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { cn } from '@/lib/utils';
@@ -28,11 +28,8 @@ import {
   CommandItem,
 } from '@/components/ui/command';
 import { Card } from '@/components/ui/card';
-import { addExpense } from '@/utils/api';
-import ButtonLoadingSpinner from '@/components/loader/ButtonLoadingSpinner';
 import { Expense } from '@/components/DataTable/DataTable';
 import { useState } from 'react';
-
 
 const categories = [
   { label: 'Food', value: 'Food' },
@@ -45,15 +42,14 @@ export interface EditExpenseType {
   _id?: string | null;
   description: string;
   amount: number;
-  date: string ;
+  date: string;
   category: string;
-
 }
 
 type EditExpenseProps = {
   setIsEditClicked: React.Dispatch<React.SetStateAction<boolean>>;
-  selectedExpense:Expense | null
-  onSave: (updatedExpense: EditExpenseType,id:string) => void;
+  selectedExpense: Expense | null;
+  onSave: (updatedExpense: EditExpenseType, id: string) => void;
 };
 
 const accountFormSchema = z.object({
@@ -82,28 +78,30 @@ type AccountFormValues = z.infer<typeof accountFormSchema>;
 
 // }
 
-const EditExpense = ({ setIsEditClicked,selectedExpense,onSave }: EditExpenseProps) => {
-    const[editedExpense, setEditedExpense] = useState(selectedExpense);
-  const { mutateAsync: addNewExpense, isPending } = addExpense();
+const EditExpense = ({
+  setIsEditClicked,
+  selectedExpense,
+  onSave,
+}: EditExpenseProps) => {
+  const [editedExpense] = useState(selectedExpense);
   const form = useForm<AccountFormValues>({
     resolver: zodResolver(accountFormSchema),
-    defaultValues:{
-      description:editedExpense?.description,
+    defaultValues: {
+      description: editedExpense?.description,
       date: parseISO(editedExpense?.date as string),
-      category:editedExpense?.category,
-      amount:editedExpense?.amount
-    }
+      category: editedExpense?.category,
+      amount: editedExpense?.amount,
+    },
   });
 
   async function onSubmit(expense: AccountFormValues) {
-    
     const expenseData = {
       ...expense,
       date: format(expense.date, 'yyyy-MM-dd'),
     };
 
-    if(editedExpense?._id){
-      onSave(expenseData,editedExpense?._id)
+    if (editedExpense?._id) {
+      onSave(expenseData, editedExpense?._id);
     }
     setIsEditClicked(false);
   }
@@ -122,8 +120,10 @@ const EditExpense = ({ setIsEditClicked,selectedExpense,onSave }: EditExpensePro
               <FormItem>
                 <FormLabel>Name</FormLabel>
                 <FormControl>
-                  <Input placeholder="Your expense" {...field} 
-                  // value={editedExpense?.description}
+                  <Input
+                    placeholder="Your expense"
+                    {...field}
+                    // value={editedExpense?.description}
                   />
                 </FormControl>
                 <FormMessage />
@@ -250,11 +250,7 @@ const EditExpense = ({ setIsEditClicked,selectedExpense,onSave }: EditExpensePro
             )}
           />
           <Button type="submit">
-            {isPending ? (
-              <ButtonLoadingSpinner loadingText="Saving.." />
-            ) : (
-              'Edit Expense'
-            )}
+            Edit Expense
           </Button>
           <Button
             variant="outline"

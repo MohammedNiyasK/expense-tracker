@@ -1,7 +1,7 @@
 import ExpenseCard from '@/components/ExpenseCard/ExpenseCard';
 import ExpensePieChart from '@/components/ExpensePieChart/ExpensePieChart';
 import DataTable from '@/components/DataTable/DataTable';
-import { recent, getSummary,editExpense } from '@/utils/api';
+import { recent, getSummary, editExpense } from '@/utils/api';
 import { useQuery } from '@tanstack/react-query';
 import CommonLoading from '@/components/loader/CommonLoading';
 import { Button } from '@/components/ui/button';
@@ -11,11 +11,10 @@ import EditExpense from './EditExpense';
 import { Expense } from '@/components/DataTable/DataTable';
 import { EditExpenseType } from './EditExpense';
 
-
 const Dashboard = () => {
   const [isClicked, setIsClicked] = useState(false);
-  const [isEditClicked,setIsEditClicked] = useState(false)
-  const [selectedExpense,setSelectedExpense] = useState<Expense | null>(null)
+  const [isEditClicked, setIsEditClicked] = useState(false);
+  const [selectedExpense, setSelectedExpense] = useState<Expense | null>(null);
 
   const { data, isLoading } = useQuery({
     queryKey: ['recent_expenses'],
@@ -24,15 +23,17 @@ const Dashboard = () => {
 
   const query = useQuery({ queryKey: ['summary'], queryFn: getSummary });
 
-  const mutation = editExpense()
+  const mutation = editExpense();
 
   const handleClick = () => {
     setIsClicked(true);
   };
 
-  const handleSaveExpense = async (updatedExpense:EditExpenseType,id:string) => {
-
-    await mutation.mutateAsync({id,updatedExpense})
+  const handleSaveExpense = async (
+    updatedExpense: EditExpenseType,
+    id: string
+  ) => {
+    await mutation.mutateAsync({ id, updatedExpense });
   };
 
   return (
@@ -91,10 +92,10 @@ const Dashboard = () => {
             <h4 className="scroll-m-20 text-xl font-semibold tracking-tight text-center my-10">
               A list of your recent expenses
             </h4>
-            <DataTable 
-            expenses={data.data} 
-            setSelectedExpense={setSelectedExpense}
-            setIsEditClicked={setIsEditClicked}
+            <DataTable
+              expenses={data.data}
+              setSelectedExpense={setSelectedExpense}
+              setIsEditClicked={setIsEditClicked}
             />
           </>
         ) : (
@@ -104,13 +105,13 @@ const Dashboard = () => {
         )}
       </div>
       {isClicked && <AddExpense setIsClicked={setIsClicked} />}
-      {
-        isEditClicked && <EditExpense 
-        setIsEditClicked={setIsEditClicked}
-        selectedExpense={selectedExpense}
-        onSave={handleSaveExpense}
+      {isEditClicked && (
+        <EditExpense
+          setIsEditClicked={setIsEditClicked}
+          selectedExpense={selectedExpense}
+          onSave={handleSaveExpense}
         />
-      }
+      )}
     </>
   );
 };

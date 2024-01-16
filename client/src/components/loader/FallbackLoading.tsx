@@ -1,4 +1,4 @@
-import { PulseLoader } from "react-spinners";
+import { PulseLoader } from 'react-spinners';
 
 const FallbackLoading = () => {
   return (
