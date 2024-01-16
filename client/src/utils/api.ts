@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createAsyncThunk } from '@reduxjs/toolkit';
 
 interface User {
@@ -10,6 +10,13 @@ interface User {
 interface SignIn {
   email: string;
   password: string;
+}
+
+interface Expense {
+  description: string;
+  amount: number;
+  category: string;
+  date: string;
 }
 
 export const http = axios.create({
@@ -73,7 +80,6 @@ function signIn() {
 
 async function recent() {
   const { data } = await API.get('/api/expense/recent');
-  console.log(data);
   return data;
 }
 async function getSummary() {
@@ -82,7 +88,6 @@ async function getSummary() {
 }
 async function getAllExpense() {
   const { data } = await API.get('/api/expense/all');
-  console.log(data);
   return data;
 }
 
@@ -101,6 +106,46 @@ const logout = async () => {
   }
 };
 
+const addExpense = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (expense: Expense) => {
+      const { data } = await API.post('/api/expense/create', expense);
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries();
+    },
+  });
+};
+// const editExpense = () => {
+
+//   const queryClient = useQueryClient()
+//   return useMutation({
+//     mutationFn: async (id: string) => {
+//       const {data} = await API.put(`/api/expense/:${id}`)
+//       return data
+//     },
+//     onSuccess:() => {
+//       queryClient.invalidateQueries();
+//     }
+//   },
+//   );
+// }
+
+const deleteExpense = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { data } = await API.delete(`/api/expense/${id}`);
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries();
+    },
+  });
+};
+
 export {
   signUp,
   signIn,
@@ -110,4 +155,6 @@ export {
   getAllExpense,
   getReport,
   logout,
+  addExpense,
+  deleteExpense,
 };

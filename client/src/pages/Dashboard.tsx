@@ -5,14 +5,22 @@ import { recent, getSummary } from '@/utils/api';
 import { useQuery } from '@tanstack/react-query';
 import CommonLoading from '@/components/loader/CommonLoading';
 import { Button } from '@/components/ui/button';
+import AddExpense from './AddExpense';
+import { useState } from 'react';
 
 const Dashboard = () => {
+  const [isClicked, setIsClicked] = useState(false);
+
   const { data, isLoading } = useQuery({
     queryKey: ['recent_expenses'],
     queryFn: recent,
   });
 
   const query = useQuery({ queryKey: ['summary'], queryFn: getSummary });
+
+  const handleClick = () => {
+    setIsClicked(true);
+  };
   return (
     <>
       <div className="mx-5 mb-10">
@@ -58,7 +66,7 @@ const Dashboard = () => {
           )
         )}
         <div className="flex items-center justify-center">
-          <Button>Add Expense</Button>
+          <Button onClick={handleClick}>Add Expense</Button>
         </div>
         {isLoading ? (
           <div className="flex items-center justify-center h-screen">
@@ -77,6 +85,7 @@ const Dashboard = () => {
           </div>
         )}
       </div>
+      {isClicked && <AddExpense setIsClicked={setIsClicked} />}
     </>
   );
 };
