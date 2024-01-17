@@ -1,6 +1,7 @@
 import axios from 'axios';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { createAsyncThunk } from '@reduxjs/toolkit';
+import { useSearchParams } from 'react-router-dom';
 
 interface User {
   username: string;
@@ -149,6 +150,44 @@ const deleteExpense = () => {
   });
 };
 
+const useFetchExpenseWithParams = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const search = searchParams.get('search');
+  const startDate = searchParams.get('startDate');
+  const endDate = searchParams.get('endDate');
+  const category = searchParams.get('category');
+  const page = searchParams.get('page');
+  const limit = searchParams.get('limit');
+
+  const { isLoading, isError, error, data } = useQuery({
+    queryKey: [
+      'all_expenses',
+      search,
+      startDate,
+      endDate,
+      category,
+      page,
+      limit,
+    ],
+    queryFn: async () => {
+      // const { data } = await API
+      // .get(`/api/expense/all?page=${page || 1}&search=${search}&startDate=${startDate}&endDate=${endDate}&category=${category}&limit=${limit || 5}`);
+      // return data;
+      const { data } = await API.get(
+        `/api/expense/all?${category ? `&category=${category}` : ''}${
+          startDate ? `&startDate=${startDate}` : ''
+        }${endDate ? `&endDate=${endDate}` : ''}${
+          search ? `&search=${search}` : ''
+        }${page ? `&page=${page}` : ''}${limit ? `&limit=${limit || 5}` : ''}`
+      );
+      return data;
+    },
+  });
+
+  return { isLoading, isError, error, data, setSearchParams, searchParams };
+};
+
 export {
   signUp,
   signIn,
@@ -161,4 +200,5 @@ export {
   addExpense,
   deleteExpense,
   editExpense,
+  useFetchExpenseWithParams,
 };

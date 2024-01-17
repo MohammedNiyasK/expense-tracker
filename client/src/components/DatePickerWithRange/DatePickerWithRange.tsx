@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { addDays, format } from 'date-fns';
 import { CalendarIcon } from '@radix-ui/react-icons';
 import { DateRange } from 'react-day-picker';
@@ -9,11 +9,18 @@ import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 
 export default function DatePickerWithRange({
   className,
-}: React.HTMLAttributes<HTMLDivElement>) {
+  onDateChange,
+}: React.HTMLAttributes<HTMLDivElement> & {
+  onDateChange?: any;
+}) {
   const [date, setDate] = useState<DateRange | undefined>({
     from: new Date(2024, 0, 1),
     to: addDays(new Date(2024, 0, 15), 15),
   });
+
+  useEffect(() => {
+    onDateChange(date);
+  }, [date]);
 
   return (
     <div className={cn('grid gap-2', className)}>
