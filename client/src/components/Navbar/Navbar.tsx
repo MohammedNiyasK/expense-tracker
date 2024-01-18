@@ -44,7 +44,9 @@ const Navbar = () => {
           <small className="hidden lg:block text-sm font-medium leading-none py-2 px-3">
             {(user as User).username}
           </small>
-          <Button onClick={handleLogout}>Logout</Button>
+          <Button onClick={handleLogout} variant="outline">
+            Logout
+          </Button>
 
           <button
             onClick={toggleMenu}

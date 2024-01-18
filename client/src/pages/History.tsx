@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import CommonLoading from '@/components/loader/CommonLoading';
 import { editExpense, useFetchExpenseWithParams } from '@/utils/api';
 import { Expense } from '@/components/DataTable/DataTable';
@@ -27,6 +27,8 @@ const History = () => {
   const [isEditClicked, setIsEditClicked] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState<Expense | null>(null);
   const [search, setSearch] = useState<string>('');
+  const [totalPage, setTotalPage] = useState<number>();
+  const [currentPage, setCurrentPage] = useState(1);
 
   const { isLoading, data, setSearchParams, searchParams } =
     useFetchExpenseWithParams();
@@ -49,14 +51,20 @@ const History = () => {
   };
 
   const handleChange = (newValue: string) => {
+    console.log(newValue);
     const newSearchParams = new URLSearchParams(searchParams.toString());
-    newSearchParams.set('category', newValue);
+    if (newValue === ' ') {
+      newSearchParams.delete('category');
+    } else {
+      newSearchParams.set('category', newValue);
+    }
     newSearchParams.delete('search');
+    newSearchParams.delete('page');
 
     setSearchParams(newSearchParams.toString());
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSearchParams({ search });
     setSearch('');
@@ -71,6 +79,37 @@ const History = () => {
     await mutation.mutateAsync({ id, updatedExpense });
   };
 
+  const handlePageIncrement = () => {
+    const newSearchParams = new URLSearchParams(searchParams.toString());
+
+    if (data?.data?.next?.page) {
+      newSearchParams.set('page', data?.data?.next?.page);
+    }
+
+    setSearchParams(newSearchParams.toString());
+  };
+
+  const handlePageDecrement = () => {
+    const newSearchParams = new URLSearchParams(searchParams.toString());
+
+    if (data?.data?.previous?.page) {
+      newSearchParams.set('page', data?.data?.previous?.page);
+    }
+
+    setSearchParams(newSearchParams.toString());
+  };
+
+  useMemo(() => {
+    if (data) {
+      const totalCount = data?.data?.totalCount;
+      const limitPerPage = Number(searchParams.get('limit')) || 5;
+
+      const totalPage = Math.ceil(totalCount / limitPerPage);
+      setTotalPage(totalPage);
+      setCurrentPage(Number(searchParams.get('page')) || 1);
+    }
+  }, [data]);
+
   return (
     <div className="mt-20 mx-5">
       <Card className="p-5">
@@ -81,16 +120,16 @@ const History = () => {
               <SelectValue placeholder="Category" />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value=" ">All</SelectItem>
               <SelectItem value="Food">Food</SelectItem>
               <SelectItem value="Entertainment">Entertainment</SelectItem>
               <SelectItem value="Transportation">Transportation</SelectItem>
               <SelectItem value="Other">Other</SelectItem>
             </SelectContent>
           </Select>
-          {/* <div className="flex w-full max-w-sm items-center space-x-2"> */}
           <form
             className="flex w-full max-w-sm items-center space-x-2"
-            onSubmit={handleSubmit}
+            onSubmit={handleSearch}
           >
             <Input
               type="text"
@@ -100,7 +139,6 @@ const History = () => {
             />
             <Button type="submit">search</Button>
           </form>
-          {/* </div> */}
         </div>
         {isLoading ? (
           <div className="flex items-center justify-center h-screen">
@@ -118,14 +156,24 @@ const History = () => {
           </div>
         )}
         <div className="flex items-center justify-end space-x-2 py-4">
-          <div className="flex-1 text-sm text-muted-foreground">
-            row(s) selected
+          <div className="flex-1 text-sm text-muted-foreground ml-5">
+            {`Page ${currentPage} of ${totalPage}`}
           </div>
           <div className="space-x-2">
-            <Button variant="outline" size="sm">
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={!data?.data?.previous?.page}
+              onClick={handlePageDecrement}
+            >
               Previous
             </Button>
-            <Button variant="outline" size="sm">
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={!data?.data?.next?.page}
+              onClick={handlePageIncrement}
+            >
               Next
             </Button>
           </div>

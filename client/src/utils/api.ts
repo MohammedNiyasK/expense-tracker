@@ -54,6 +54,9 @@ API.interceptors.request.use(
   }
 );
 
+/*
+ *Handle if refresh token is rejected
+ */
 const refreshTokenAction = createAsyncThunk(
   'auth/refreshToken',
   async (refreshToken: string) => {

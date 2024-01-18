@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { addDays, format } from 'date-fns';
+import { format, startOfMonth, endOfMonth } from 'date-fns';
 import { CalendarIcon } from '@radix-ui/react-icons';
 import { DateRange } from 'react-day-picker';
 import { cn } from '@/lib/utils';
@@ -13,9 +13,10 @@ export default function DatePickerWithRange({
 }: React.HTMLAttributes<HTMLDivElement> & {
   onDateChange?: any;
 }) {
+  const today = new Date();
   const [date, setDate] = useState<DateRange | undefined>({
-    from: new Date(2024, 0, 1),
-    to: addDays(new Date(2024, 0, 15), 15),
+    from: startOfMonth(today),
+    to: endOfMonth(today),
   });
 
   useEffect(() => {
