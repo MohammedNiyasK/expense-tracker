@@ -7,14 +7,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import ExpenseCard from '@/components/ExpenseCard/ExpenseCard';
 import BarChart from '@/components/BarChart/BarChart';
-import { useQuery } from '@tanstack/react-query';
-import { getReport } from '@/utils/api';
 import CommonLoading from '@/components/loader/CommonLoading';
+import { useFetchReportWithParams } from '@/utils/api';
+import { getYear } from 'date-fns';
 
-const months = [
+export const months = [
   'Jan',
   'Feb',
   'Mar',
@@ -31,19 +31,26 @@ const months = [
 
 const Report = () => {
   const [selectedMonth, setSelectedMonth] = useState('');
-  const [selectedYear, setSelectedYear] = useState('2024');
+  const [selectedYear, setSelectedYear] = useState(String(getYear(new Date())));
 
-  const { data, isLoading } = useQuery({
-    queryKey: ['report'],
-    queryFn: getReport,
-  });
+  const { data, isLoading, setSearchParams, searchParams } =
+    useFetchReportWithParams();
+
+  useEffect(() => {
+    setSearchParams({ year: selectedYear });
+  }, []);
 
   const handleMonthChange = (newValue: string) => {
     setSelectedMonth(newValue);
+
+    const newSearchParams = new URLSearchParams(searchParams.toString());
+    newSearchParams.set('month', newValue);
+    setSearchParams(newSearchParams.toString());
   };
 
   const handleYearChange = (newValue: string) => {
     setSelectedYear(newValue);
+    setSearchParams({ year: newValue });
   };
 
   return (
@@ -88,6 +95,17 @@ const Report = () => {
         </div>
 
         <div className="my-10 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {data?.data?.expensesByCategory[0]?.totalExpenses && (
+            <ExpenseCard
+              title={
+                selectedYear && selectedMonth
+                  ? `Total: ${months[Number(selectedMonth) - 1]} Month Expense`
+                  : `Total:  ${selectedYear}  Expense`
+              }
+              amount={data?.data?.expensesByCategory[0]?.totalExpenses}
+            />
+          )}
+
           {isLoading ? (
             <div className="flex items-center justify-center h-screen">
               <CommonLoading />
@@ -110,10 +128,18 @@ const Report = () => {
         </div>
         <Card className="col-span-4 mb-10">
           <CardHeader>
-            <CardTitle>Overview</CardTitle>
+            <CardTitle>
+              {selectedYear && selectedMonth
+                ? `${months[Number(selectedMonth) - 1]} Overview`
+                : `${selectedYear} Overview`}
+            </CardTitle>
           </CardHeader>
           <CardContent className="pl-2">
-            <BarChart />
+            <BarChart
+              expenseData={data?.data?.expenseData[0]?.categories}
+              month={selectedMonth}
+              year={selectedYear}
+            />
           </CardContent>
         </Card>
       </div>

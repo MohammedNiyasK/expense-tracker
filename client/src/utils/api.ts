@@ -174,9 +174,6 @@ const useFetchExpenseWithParams = () => {
       limit,
     ],
     queryFn: async () => {
-      // const { data } = await API
-      // .get(`/api/expense/all?page=${page || 1}&search=${search}&startDate=${startDate}&endDate=${endDate}&category=${category}&limit=${limit || 5}`);
-      // return data;
       const { data } = await API.get(
         `/api/expense/all?${category ? `&category=${category}` : ''}${
           startDate ? `&startDate=${startDate}` : ''
@@ -189,6 +186,26 @@ const useFetchExpenseWithParams = () => {
   });
 
   return { isLoading, isError, error, data, setSearchParams, searchParams };
+};
+
+const useFetchReportWithParams = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const year = searchParams.get('year');
+  const month = searchParams.get('month');
+
+  const { isLoading, data, isError, error } = useQuery({
+    queryKey: ['report', year, month],
+    queryFn: async () => {
+      const { data } = await API.get(
+        `/api/expense/report?year=${year}${month ? `&month=${month}` : ''}`
+      );
+
+      return data;
+    },
+  });
+
+  return { isLoading, data, isError, error, searchParams, setSearchParams };
 };
 
 export {
@@ -204,4 +221,5 @@ export {
   deleteExpense,
   editExpense,
   useFetchExpenseWithParams,
+  useFetchReportWithParams,
 };

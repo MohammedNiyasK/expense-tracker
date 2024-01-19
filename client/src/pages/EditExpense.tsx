@@ -74,10 +74,6 @@ const accountFormSchema = z.object({
 
 type AccountFormValues = z.infer<typeof accountFormSchema>;
 
-// const defaultValues: Partial<AccountFormValues> = {
-
-// }
-
 const EditExpense = ({
   setIsEditClicked,
   selectedExpense,
@@ -120,11 +116,7 @@ const EditExpense = ({
               <FormItem>
                 <FormLabel>Name</FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder="Your expense"
-                    {...field}
-                    // value={editedExpense?.description}
-                  />
+                  <Input placeholder="Your expense" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -249,7 +241,7 @@ const EditExpense = ({
               </FormItem>
             )}
           />
-          <Button type="submit">Edit Expense</Button>
+          <Button type="submit">Save</Button>
           <Button
             variant="outline"
             className="ml-5"

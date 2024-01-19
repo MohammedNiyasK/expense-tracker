@@ -51,7 +51,6 @@ const History = () => {
   };
 
   const handleChange = (newValue: string) => {
-    console.log(newValue);
     const newSearchParams = new URLSearchParams(searchParams.toString());
     if (newValue === ' ') {
       newSearchParams.delete('category');
